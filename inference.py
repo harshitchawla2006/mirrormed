@@ -3,12 +3,9 @@ import torch.nn as nn
 import timm
 import json
 import numpy as np
-import base64
 import io
 from torchvision import transforms
 from PIL import Image
-from pytorch_grad_cam import GradCAM
-from pytorch_grad_cam.utils.image import show_cam_on_image
 
 with open('class_map.json', 'r') as f:
     class_map = json.load(f)
@@ -61,35 +58,8 @@ def mc_predict(image_bytes, n_passes=10):
     confidence  = round(mean.max().item(), 4)
     uncertainty = round(variance.mean().item(), 6)
 
-    heatmap_b64 = generate_gradcam(image, tensor, pred_class)
-
     return {
         "class"      : class_map[pred_class],
         "confidence" : confidence,
-        "uncertainty": uncertainty,
-        "heatmap"    : heatmap_b64
+        "uncertainty": uncertainty
     }
-
-def generate_gradcam(pil_image, tensor, pred_class):
-    try:
-        target_layer = [model.conv_head]
-        cam = GradCAM(model=model, target_layers=target_layer)
-
-        grayscale_cam = cam(input_tensor=tensor, targets=None)
-
-        # resize original image to 224x224 and convert to float32 numpy
-        img_resized = pil_image.resize((224, 224))
-        img_np = np.array(img_resized, dtype=np.float32) / 255.0
-
-        # overlay heatmap
-        visualization = show_cam_on_image(img_np, grayscale_cam[0], use_rgb=True)
-
-        # encode to base64
-        vis_pil = Image.fromarray(visualization)
-        buffer  = io.BytesIO()
-        vis_pil.save(buffer, format='PNG')
-        return base64.b64encode(buffer.getvalue()).decode('utf-8')
-
-    except Exception as e:
-        print(f"Grad-CAM error: {e}")
-        return None
