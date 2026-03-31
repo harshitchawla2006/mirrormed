@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pillow
+python-multipart
+timm
+numpy<2.0
+opencv-python-headless
+grad-cam
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.0.0+cpu
+torchvision==0.15.0+cpu
