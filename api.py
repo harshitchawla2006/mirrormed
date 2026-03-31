@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from inference import mc_predict
 import asyncio
+from typing import List
 import httpx
 import logging
 import time
@@ -149,7 +150,7 @@ async def predict(file: UploadFile = File(...)):
 
 # ── batch predict ─────────────────────────────────────────────
 @app.post("/predict/batch")
-async def predict_batch(files: list[UploadFile] = File(...)):
+async def predict_batch(files: List[UploadFile] = File(...)):
     if len(files) > 5:
         raise HTTPException(status_code=400, detail="Maximum 5 images per batch")
 
