@@ -42,7 +42,7 @@ def enable_dropout(model):
         if isinstance(m, nn.Dropout):
             m.train()
 
-def mc_predict(image_bytes, n_passes=30):
+def mc_predict(image_bytes, n_passes=10):
     image  = Image.open(io.BytesIO(image_bytes)).convert('RGB')
     tensor = transform(image).unsqueeze(0).to(device)
 
