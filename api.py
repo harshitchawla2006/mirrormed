@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from inference import mc_predict
 import asyncio
@@ -14,9 +15,17 @@ app.add_middleware(
     allow_headers     = ["*"],
 )
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def root():
-    return {"message": "MirrorMed API is running"}
+    return """
+    <html>
+        <body style="font-family:sans-serif;padding:2rem;background:#f0f4f8">
+            <h1>🔬 MirrorMed API</h1>
+            <p>Status: <strong style="color:green">Running ✓</strong></p>
+            <p><a href="/health">Health Check</a> · <a href="/docs">API Docs</a></p>
+        </body>
+    </html>
+    """
 
 @app.get("/health")
 def health():
@@ -33,7 +42,6 @@ async def predict(file: UploadFile = File(...)):
     result      = mc_predict(image_bytes)
     return result
 
-# ── keep alive — pings itself every 10 minutes ──────────────
 @app.on_event("startup")
 async def start_keep_alive():
     asyncio.create_task(keep_alive())
@@ -43,8 +51,8 @@ async def keep_alive():
     while True:
         try:
             async with httpx.AsyncClient() as client:
-                await client.get("https://mirrormed-backend.onrender.com/health", timeout=10)
+                await client.get("https://lordaizen55-mirrormed-api.hf.space/health", timeout=10)
                 print("Keep-alive ping sent")
         except Exception as e:
             print(f"Keep-alive failed: {e}")
-        await asyncio.sleep(600)  # ping every 10 minutes
+        await asyncio.sleep(600)
