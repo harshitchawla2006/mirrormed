@@ -1,14 +1,21 @@
 FROM python:3.10-slim
 
-WORKDIR /app
+# Create user with ID 1000 to resolve Hugging Face Spaces permissions
+RUN useradd -m -u 1000 user
+USER user
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+WORKDIR $HOME/app
 
-COPY api.py .
-COPY inference.py .
-COPY best_model.pt .
-COPY class_map.json .
+COPY --chown=user requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+COPY --chown=user api.py .
+COPY --chown=user inference.py .
+COPY --chown=user best_model.pt .
+COPY --chown=user class_map.json .
 
 EXPOSE 7860
 
