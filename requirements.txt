@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 fastapi
 uvicorn
 pillow
@@ -10,8 +9,3 @@ grad-cam
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch==2.0.0+cpu
 torchvision==0.15.0+cpu
-=======
-altair
-pandas
-streamlit
->>>>>>> a5bb3844dc0c67413836b639b55e37468e518e58
