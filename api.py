@@ -66,7 +66,6 @@ def root():
             <li><code>GET /health</code> — health check</li>
             <li><code>GET /metrics</code> — prediction statistics</li>
             <li><code>POST /predict</code> — classify skin lesion image</li>
-            <li><code>POST /predict/batch</code> — classify multiple images</li>
         </ul>
         <hr style="border-color:#e2e8f0">
         <p style="color:#718096;font-size:0.85rem">Model: EfficientNet-B3 · Dataset: HAM10000 (10,015 images) · Classes: 7</p>
@@ -148,33 +147,7 @@ async def predict(file: UploadFile = File(...)):
         "mc_passes"        : 10
     }
 
-# ── batch predict ─────────────────────────────────────────────
-# @app.post("/predict/batch")
-# async def predict_batch(files: List[UploadFile] = File(...)):
-#     if len(files) > 5:
-#         raise HTTPException(status_code=400, detail="Maximum 5 images per batch")
 
-#     results = []
-#     for file in files:
-#         if file.content_type not in ["image/jpeg", "image/png", "image/jpg"]:
-#             results.append({"filename": file.filename, "error": "Invalid file type"})
-#             continue
-#         try:
-#             image_bytes = await file.read()
-#             result      = mc_predict(image_bytes)
-#             results.append({"filename": file.filename, **result})
-
-#             metrics["total_predictions"]                   += 1
-#             metrics["class_distribution"][result["class"]] += 1
-
-#         except Exception as e:
-#             metrics["errors"] += 1
-#             results.append({"filename": file.filename, "error": str(e)})
-
-#     logger.info(f"BATCH PREDICT | {len(files)} images processed")
-#     return {"results": results, "total": len(results)}
-
-# ── keep alive ────────────────────────────────────────────────
 @app.on_event("startup")
 async def start_keep_alive():
     logger.info("MirrorMed API started successfully")
